@@ -1,6 +1,7 @@
 
 const express = require("express");
 const userData = require("../models/userModel.js")
+const mongoose = require("mongoose");
 
 const router = express.Router();
 
@@ -49,59 +50,127 @@ try{
 
 // GET A SINGLE USER:
 
-router.get("/:id" , async(req, res)=>{
-    const {id} = req.params;
-    try{
-            const singleUser = await userData.findById({_id : id});
-            res.status(200).json(singleUser)
+// router.get("/:id" , async(req, res)=>{
+//     const {id} = req.params;
+//     try{
+//             const singleUser = await userData.findById({_id : id});
+//             res.status(200).json(singleUser)
     
     
-        }catch(error){
-            console.log(error)
-            res.send(500).json({error:error.message})
-        }
+//         }catch(error){
+//             console.log(error)
+//             res.send(500).json({error:error.message})
+//         }
     
        
-    })
+//     })
+
+
+
+
+
+router.get("/:id", async (req, res) => {
+    const { id } = req.params;
+  
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: 'Invalid user ID' });
+    }
+  
+    try {
+      const singleUser = await userData.findById(id);
+      if (!singleUser) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      res.status(200).json(singleUser);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
 
     // DELETE:
 
-    router.delete("/:id" , async(req, res)=>{
-        const {id} = req.params;
-        try{
-                const singleUser = await userData.findByIdAndDelete({_id : id});
-                res.status(200).json(singleUser)
+    // router.delete("/:id" , async(req, res)=>{
+    //     const {id} = req.params;
+    //     try{
+    //             const singleUser = await userData.findByIdAndDelete({_id : id});
+    //             res.status(200).json(singleUser)
         
         
-            }catch(error){
-                console.log(error)
-                res.send(500).json({error:error.message})
-            }
+    //         }catch(error){
+    //             console.log(error)
+    //             res.send(500).json({error:error.message})
+    //         }
         
            
-        }) 
+    //     }) 
+
+
+    router.delete("/:id", async (req, res) => {
+        const { id } = req.params;
+      
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+          return res.status(400).json({ error: 'Invalid user ID' });
+        }
+      
+        try {
+          const singleUser = await userData.findByIdAndDelete(id);
+          if (!singleUser) {
+            return res.status(404).json({ error: 'User not found' });
+          }
+          res.status(200).json(singleUser);
+        } catch (error) {
+          console.log(error);
+          res.status(500).json({ error: error.message });
+        }
+      });
 
 
         // UPDATE:
 
 
-        router.patch("/:id" , async(req, res)=>{
-            const {id} = req.params;
-            const{name, email, age, picture} = req.body;
-            try{
-                    const updateUser = await userData.findByIdAndUpdate(id, req.body, {
-                        new:true,
-                    });
-                    res.status(200).json(updateUser)
+        // router.patch("/:id" , async(req, res)=>{
+        //     const {id} = req.params;
+        //     const{name, email, age, picture} = req.body;
+        //     try{
+        //             const updateUser = await userData.findByIdAndUpdate(id, req.body, {
+        //                 new:true,
+        //             });
+        //             res.status(200).json(updateUser)
             
             
-                }catch(error){
-                    console.log(error)
-                    res.send(500).json({error:error.message})
-                }
+        //         }catch(error){
+        //             console.log(error)
+        //             res.send(500).json({error:error.message})
+        //         }
             
                
-            }) 
+        //     }) 
+
+
+        router.patch("/:id", async (req, res) => {
+            const { id } = req.params;
+            const { name, email, age, picture } = req.body;
+          
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+              return res.status(400).json({ error: 'Invalid user ID' });
+            }
+          
+            try {
+              const updateUser = await userData.findByIdAndUpdate(id, req.body, {
+                new: true,
+              });
+              if (!updateUser) {
+                return res.status(404).json({ error: 'User not found' });
+              }
+              res.status(200).json(updateUser);
+            } catch (error) {
+              console.log(error);
+              res.status(500).json({ error: error.message });
+            }
+          });
+          
 
     
 
